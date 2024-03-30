@@ -2,6 +2,7 @@
 using APICatalogo.Controllers.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
@@ -64,6 +65,18 @@ namespace APICatalogo.Controllers
             // Retorna os dados do produto cadastrado na rota Get(id)
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = produto.ProdutoID }, produto);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Produto produto)
+        {
+            if (id != produto.ProdutoID)
+                return BadRequest();
+
+            _context.Entry(produto).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(produto);
         }
     }
 }
