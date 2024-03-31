@@ -19,23 +19,42 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context.Categorias.AsNoTracking().ToList();
+            try
+            {
+                // throw new DataMisalignedException();
 
-            if(categorias is null)
-                return NotFound("Não existe categorias cadastradas!");
+                var categorias = _context.Categorias.AsNoTracking().ToList();
 
-            return categorias;
+                if (categorias is null)
+                   return NotFound("Não existe categorias cadastradas!");
+
+                return categorias;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tratar a sua solicitação.");
+            }
+
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaID == id);
+            try
+            {
+                var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaID == id);
 
-            if (categoria is null)
-                return NotFound("Categoria não encontrada!");
+                if (categoria is null)
+                    return NotFound($"Categoria com ID {id} não encontrada!");
 
-            return Ok(categoria);
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tratar a sua solicitação.");
+            }
+
+
         }
 
         [HttpGet("produtos")]
@@ -85,7 +104,7 @@ namespace APICatalogo.Controllers
         {
             var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaID == id);
             if (categoria is null)
-                return BadRequest("Categoria não encontrada!");
+                return BadRequest($"Categoria com ID {id} não encontrada!");
 
             _context.Categorias.Remove(categoria);
             _context.SaveChanges();
