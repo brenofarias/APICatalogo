@@ -1,4 +1,4 @@
-﻿using APICatalogo.Controllers.Models;
+﻿using APICatalogo.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Context;

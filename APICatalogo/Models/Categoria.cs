@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace APICatalogo.Controllers.Models;
+namespace APICatalogo.Models;
 
 [Table("Categorias")]
 public class Categoria
 {
-    public Categoria() 
-    { 
+    public Categoria()
+    {
         Produtos = new Collection<Produto>();
     }
 
