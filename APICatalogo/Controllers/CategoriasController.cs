@@ -40,6 +40,14 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
+            // Utilizando o middleware de exception
+            // throw new Exception("Exceção ao retornar o produto");
+            //string[] teste = null;
+            //if (teste.Length > 0)
+            //{
+
+            //}
+
             try
             {
                 var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaID == id);
