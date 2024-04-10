@@ -12,15 +12,19 @@ namespace APICatalogo.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public CategoriasController(AppDbContext context)
+        private readonly ILogger _logger;
+        public CategoriasController(AppDbContext context, ILogger<CategoriasController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
+            _logger.LogInformation("================ GET /categorias ================");
+
             try
             {
                 // throw new DataMisalignedException();
@@ -42,6 +46,8 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
+            _logger.LogInformation("================ GET /categorias/id ================");
+
             // Utilizando o middleware de exception
             // throw new Exception("Exceção ao retornar o produto");
             //string[] teste = null;
@@ -55,7 +61,10 @@ namespace APICatalogo.Controllers
                 var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaID == id);
 
                 if (categoria is null)
+                {
+                    _logger.LogInformation("================ GET /categorias/produtos NOT FOUND ================");
                     return NotFound($"Categoria com ID {id} não encontrada!");
+                }
 
                 return Ok(categoria);
             }
@@ -70,7 +79,7 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            // return _context.Categorias.Include(p => p.Produtos).ToList();
+            _logger.LogInformation("================ GET /categorias/produtos ================");
 
             return _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaID <= 5).AsNoTracking().ToList();
         }
