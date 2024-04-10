@@ -44,36 +44,17 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<Categoria> Get(int id)
+        public async Task<ActionResult<Categoria>> Get(int id)
         {
-            _logger.LogInformation("================ GET /categorias/id ================");
+           var categoria = await _context.Categorias.FirstOrDefaultAsync(p => p.CategoriaID == id);
 
-            // Utilizando o middleware de exception
-            // throw new Exception("Exceção ao retornar o produto");
-            //string[] teste = null;
-            //if (teste.Length > 0)
-            //{
-
-            //}
-
-            try
+            if (categoria == null)
             {
-                var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaID == id);
-
-                if (categoria is null)
-                {
-                    _logger.LogInformation("================ GET /categorias/produtos NOT FOUND ================");
-                    return NotFound($"Categoria com ID {id} não encontrada!");
-                }
-
-                return Ok(categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tratar a sua solicitação.");
+                _logger.LogWarning($"Categoria com id = {id} não encontrada...");
+                return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-
+            return Ok(categoria);
         }
 
         [HttpGet("produtos")]
@@ -89,14 +70,20 @@ namespace APICatalogo.Controllers
         {
             // Verifica se existe dados
             if (categoria is null)
-                return BadRequest();
+            {
+                _logger.LogWarning($"Dados inválidos...");
+                return BadRequest("Dados inválidos");
+            }
 
             // Recupera todos as categoria
             var produtos = _context.Produtos.ToList();
             // Verifica se já existe uma categoria com o mesmo nome
             bool existe = produtos.Any(p => p.Nome == categoria.Nome);
             if (existe)
-                return BadRequest("Categoria já existe!");
+            {
+                _logger.LogWarning($"Categoria já existe...");
+                return BadRequest("Categoria já existe");
+            }
 
             _context.Categorias.Add(categoria);
             _context.SaveChanges();
@@ -110,7 +97,10 @@ namespace APICatalogo.Controllers
         public ActionResult Put(int id, Categoria categoria)
         {
             if (id != categoria.CategoriaID)
-                return BadRequest();
+            {
+                _logger.LogWarning($"Categoria de id = {id} não existe...");
+                return BadRequest($"Categoria de id = {id} não existe");
+            }
 
             _context.Entry(categoria).State = EntityState.Modified;
             _context.SaveChanges(); 
@@ -123,7 +113,10 @@ namespace APICatalogo.Controllers
         {
             var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaID == id);
             if (categoria is null)
-                return BadRequest($"Categoria com ID {id} não encontrada!");
+            {
+                _logger.LogWarning($"Categoria de id = {id} não existe...");
+                return BadRequest($"Categoria de id = {id} não existe");
+            }
 
             _context.Categorias.Remove(categoria);
             _context.SaveChanges();
